@@ -5,8 +5,8 @@ import numpy as np # type: ignore
 
 
 # Verificar si se proporciona el número de valores como argumento
-if len(sys.argv) != 8 or sys.argv[1] != "-n" or sys.argv[3] != "-c" or sys.argv[5] != "-s" or sys.argv[7] != "a":
-    print("Uso: python programa.py -n <num_valores> -c <num_corridas> -s <estrategia> -a <tipo_capital>")
+if len(sys.argv) != 5 or sys.argv[1] != "-n" or sys.argv[3] != "-c":
+    print("Uso: python programa.py -n <num_valores> -c <num_corridas>")
     sys.exit(1)
     
 
@@ -33,10 +33,10 @@ for i in range(num_corridas):
 # Lista para almacenar los valores del capital a medida que se realizan las tiradas 
     valores_capital_acotado = []
 
-# Almacenamiento del capital , apuesta inicial y contador
+# Almacenamiento del capital , apuesta inicial , contador, bancarrotas
     cap_acotado = 500
     apu_inicial = 1
-    
+    cant_bancarrotas = 0
     cont = 0;  # se utiliza para reiniciar la apuesta a la inicial en el caso q salga rojo
 
 # Verificar colores
@@ -58,29 +58,33 @@ def verificar_color(numero):
 
 
 # Metodo Martingale
-for i in range(num_corridas):
-    for j in range(num_valores):
-        if (verificar_color(valores_todas_tiradas[i][j])):
-            if(cont==0):
-                cap_acotado = cap_acotado- apu_inicial          #Aca creo que se puede hacer (cap_acotado = cap_acotado + 1) en lugar de las 2 operaciones, deje las 2 para que se entienda, 
-                cap_acotado = cap_acotado + 2*apu_inicial       #ya que en realidad lo que se resta es la apuesta y lo que se suma es la ganancia
-                valores_capital_acotado.append(cap_acotado)
-            else: 
-                cap_acotado= cap_acotado - 2**cont     # Ej: si salio 1 negro, cont= 1 --> resto 2 (apuesta) y gano 4 (ganancia)
-                cap_acotado= cap_acotado + 2**(cont+1)
-                valores_capital_acotado.append(cap_acotado)
-                cont =0;    # Aca si necesito reiniciar el contador ya que antes salio un negro para entrar en este else, osea (cont != 0)
-            
-        else:   
-            if(cont == 0):
-              cap_acotado = cap_acotado - apu_inicial;
-              valores_capital_acotado.append(cap_acotado)
-              cont= cont+1;
-            else:
-                cap_acotado= cap_acotado - 2**cont
-                valores_capital_acotado.append(cap_acotado);
-                cont=cont+1;
 
+    for i in range(num_corridas):
+        for j in range(num_valores):
+            if (verificar_color(valores_todas_tiradas[i][j])):
+                if(cont==0):
+                    cap_acotado = cap_acotado- apu_inicial          #Aca creo que se puede hacer (cap_acotado = cap_acotado + 1) en lugar de las 2 operaciones, deje las 2 para que se entienda, 
+                    cap_acotado = cap_acotado + 2*apu_inicial       #ya que en realidad lo que se resta es la apuesta y lo que se suma es la ganancia
+                    valores_capital_acotado.append(cap_acotado)
+                    
+                else: 
+                    cap_acotado= cap_acotado - 2**cont     # Ej: si salio 1 negro, cont= 1 --> resto 2 (apuesta) y gano 4 (ganancia)
+                    cap_acotado= cap_acotado + 2**(cont+1)
+                    valores_capital_acotado.append(cap_acotado)
+                    cont =0;    # Aca si necesito reiniciar el contador ya que antes salio un negro para entrar en este else, osea (cont != 0)
+            else:   
+                if(cont == 0):
+                        cap_acotado = cap_acotado - apu_inicial;
+                        valores_capital_acotado.append(cap_acotado)
+                        cont= cont+1;
+                else:
+                        cap_acotado= cap_acotado - 2**cont
+                        valores_capital_acotado.append(cap_acotado);
+                        cont=cont+1;
+                if(cap_acotado<=0):
+                        cant_bancarrotas= cant_bancarrotas +1;
 
 print(valores_todas_tiradas)
+print(valores_capital_acotado)
+print(cant_bancarrotas)
 a = input()
