@@ -1,7 +1,7 @@
 import random
 import sys
 import numpy as np # type: ignore
-#import matplotlib.pyplot as plt # type: ignore
+import matplotlib.pyplot as plt # type: ignore
 
 
 # Verificar si se proporciona el número de valores como argumento
@@ -39,10 +39,10 @@ for i in range(num_corridas):
     cant_bancarrotas = 0
     cont = 0;  # se utiliza para reiniciar la apuesta a la inicial en el caso q salga rojo
 
-# Verificar colores
-def verificar_color(numero):
 # El color elegido para apostar es el rojo
 # Verificar si el número es rojo
+def verificar_color(numero):
+
     if (numero >= 1 and numero <= 10) or (numero >= 19 and numero <= 28):
         if numero % 2 == 1:
             return True
@@ -56,35 +56,63 @@ def verificar_color(numero):
     elif numero == 0:
             return False
 
+# Metodo Martingale (si pierde duplica la apuesta, si gana vuelve a la apuesta inicial)
+valores_capital_acotado = []
 
-# Metodo Martingale
-
-    for i in range(num_corridas):
-        for j in range(num_valores):
-            if (verificar_color(valores_todas_tiradas[i][j])):
-                if(cont==0):
-                    cap_acotado = cap_acotado- apu_inicial          #Aca creo que se puede hacer (cap_acotado = cap_acotado + 1) en lugar de las 2 operaciones, deje las 2 para que se entienda, 
-                    cap_acotado = cap_acotado + 2*apu_inicial       #ya que en realidad lo que se resta es la apuesta y lo que se suma es la ganancia
-                    valores_capital_acotado.append(cap_acotado)
-                    
-                else: 
-                    cap_acotado= cap_acotado - 2**cont     # Ej: si salio 1 negro, cont= 1 --> resto 2 (apuesta) y gano 4 (ganancia)
-                    cap_acotado= cap_acotado + 2**(cont+1)
-                    valores_capital_acotado.append(cap_acotado)
-                    cont =0;    # Aca si necesito reiniciar el contador ya que antes salio un negro para entrar en este else, osea (cont != 0)
-            else:   
-                if(cont == 0):
-                        cap_acotado = cap_acotado - apu_inicial;
-                        valores_capital_acotado.append(cap_acotado)
-                        cont= cont+1;
-                else:
-                        cap_acotado= cap_acotado - 2**cont
-                        valores_capital_acotado.append(cap_acotado);
-                        cont=cont+1;
-                if(cap_acotado<=0):
-                        cant_bancarrotas= cant_bancarrotas +1;
+for tirada in valores_todas_tiradas:
+    valores_capital_corrida = []  # Sublista para almacenar los valores del capital por cada corrida
+    cap_acotado = 500  # Reiniciar el capital acotado después de cada corrida
+    cont = 0  # Reiniciar el contador después de cada corrida
+    for valor in tirada:
+        if verificar_color(valor):
+            if cont == 0:
+                cap_acotado -= apu_inicial
+                cap_acotado += 2 * apu_inicial
+                valores_capital_corrida.append(cap_acotado)
+            else:
+                apuesta = min(2 ** cont, cap_acotado)
+                cap_acotado -= apuesta
+                cap_acotado += 2 * apuesta
+                valores_capital_corrida.append(cap_acotado)
+                cont = 0
+        else:
+            if cont == 0:
+                cap_acotado -= apu_inicial
+                valores_capital_corrida.append(cap_acotado)
+                cont += 1
+            else:
+                apuesta = min(2 ** cont, cap_acotado)
+                cap_acotado -= apuesta
+                valores_capital_corrida.append(cap_acotado)
+                cont += 1
+            if cap_acotado <= 0:
+                cant_bancarrotas += 1
+                break  # Se detiene si cap_acotado es cero
+        cap_acotado = max(0, cap_acotado)  # Asegurar que cap_acotado no sea negativo
+    valores_capital_acotado.append(valores_capital_corrida)
 
 print(valores_todas_tiradas)
+print()
 print(valores_capital_acotado)
 print(cant_bancarrotas)
-a = input()
+
+# Calcular la ganancia total y por cada corrida
+ganancia_total = 0
+ganancias_por_corrida = []
+
+for corrida in valores_capital_acotado:
+    ganancia_corrida = corrida[-1] - 500
+    ganancia_total += ganancia_corrida
+    ganancias_por_corrida.append(ganancia_corrida)
+
+# Mostrar ganancias
+print("Ganancia total:", ganancia_total)
+print("Ganancias por corrida:", ganancias_por_corrida)
+
+# Crear imagenes de capital_acotado en cada tirada, una imagen por cada corrida
+for i, corrida in enumerate(valores_capital_acotado):
+    plt.plot(corrida)
+    plt.xlabel('Tirada')
+    plt.ylabel('Capital Acotado')
+    plt.title(f'Corrida {i+1}')
+    plt.show()
