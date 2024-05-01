@@ -145,6 +145,35 @@ if estrategia == 'd':
             cap_acotado = max(0, cap_acotado)  # Asegurar que cap_acotado no sea negativo
         valores_capital_acotado.append(valores_capital_corrida)
 
+# Metodo Fibonacci (si pierde aumenta la apuesta en la suma de los dos anteriores, si gana vuelve a la apuesta inicial)
+if estrategia == 'f':
+    valores_capital_acotado = []  # Lista para almacenar los valores del capital a medida que se realizan las tiradas
+    for tirada in valores_todas_tiradas:
+        valores_capital_corrida = []  # Sublista para almacenar los valores del capital por cada corrida
+        cap_acotado = 500  # Reiniciar el capital acotado después de cada corrida
+        apuesta_anterior = apu_inicial  # Inicializar la apuesta anterior como la apuesta inicial
+        apuesta_actual = apu_inicial  # Inicializar la apuesta actual como la apuesta inicial
+        for valor in tirada:
+            if verificar_color(valor):
+                cap_acotado -= apuesta_actual
+                cap_acotado += 2 * apuesta_actual
+                valores_capital_corrida.append(cap_acotado)
+                apuesta_anterior, apuesta_actual = apuesta_actual, apuesta_anterior + apuesta_actual
+            else:
+                cap_acotado -= apuesta_actual
+                valores_capital_corrida.append(cap_acotado)
+                apuesta_anterior, apuesta_actual = apuesta_actual, apuesta_anterior + apuesta_actual
+                if cap_acotado <= 0:
+                    cant_bancarrotas += 1
+                    if tipo_capital == 'f':
+                        break  # Se detiene si cap_acotado es cero y el tipo de capital es finito
+            cap_acotado = max(0, cap_acotado)  # Asegurar que cap_acotado no sea negativo
+        valores_capital_acotado.append(valores_capital_corrida)
+
+
+
+
+
 print(valores_todas_tiradas)
 print()
 print(valores_capital_acotado)
