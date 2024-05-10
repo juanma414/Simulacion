@@ -223,3 +223,23 @@ for i, corrida in enumerate(valores_capital_acotado):
     plt.title(f'Corrida {i+1}')
     plt.show()
 
+    # Calcular la cantidad de tiradas hasta obtener un resultado favorable
+    tiradas_hasta_favorable = []
+    count = 0
+    for tirada in valores_todas_tiradas:
+        for i, valor in enumerate(tirada):
+            if verificar_color(valor):
+                count += 1
+                tiradas_hasta_favorable.append(count)
+                count = 0
+            else:
+                count += 1
+
+    # Graficar las frecuencias de las tiradas hasta obtener un resultado favorable
+    plt.hist(tiradas_hasta_favorable, bins=range(0, num_valores+2), align='left', rwidth=0.8)
+    plt.xlabel('Tiradas')
+    plt.ylabel('Frecuencia')
+    plt.title('Frecuencia de tiradas hasta obtener un resultado favorable')
+    plt.xticks(range(0, 16))  # Modificar el rango del eje x
+    plt.xlim(0, 15)  # Ajustar el límite del eje x
+    plt.show()
