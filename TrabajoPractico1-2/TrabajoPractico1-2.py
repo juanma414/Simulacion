@@ -143,7 +143,7 @@ if estrategia == 'd':
             cap_acotado = max(0, cap_acotado)  # Asegurar que cap_acotado no sea negativo
         valores_capital_acotado.append(valores_capital_corrida)
 
-# Metodo Fibonacci (si pierde aumenta la apuesta en la suma de los dos anteriores, si gana vuelve a la apuesta inicial)
+# Metodo Fibonacci (si pierde aumenta la apuesta en la suma de los dos anteriores, si gana retrocede dos posiciones en la serie)
 if estrategia == 'f':
     valores_capital_acotado = []  # Lista para almacenar los valores del capital a medida que se realizan las tiradas
     for tirada in valores_todas_tiradas:
@@ -156,7 +156,7 @@ if estrategia == 'f':
                 cap_acotado -= apuesta_actual
                 cap_acotado += 2 * apuesta_actual
                 valores_capital_corrida.append(cap_acotado)
-                apuesta_anterior, apuesta_actual = apuesta_actual, apuesta_anterior + apuesta_actual
+                apuesta_anterior, apuesta_actual = apuesta_actual, max(apuesta_anterior - 2 * apuesta_actual, apu_inicial)
             else:
                 cap_acotado -= apuesta_actual
                 valores_capital_corrida.append(cap_acotado)
@@ -216,6 +216,7 @@ print("Ganancias por corrida:", ganancias_por_corrida)
 # Crear imagenes de capital_acotado en cada tirada, una imagen por cada corrida
 for i, corrida in enumerate(valores_capital_acotado):
     plt.plot(corrida)
+    plt.axhline(y=500, color='r', linestyle='--')  # Agregar línea horizontal en el valor 500
     plt.xlabel('Tirada')
     plt.ylabel('Capital Acotado')
     plt.title(f'Corrida {i+1}')
@@ -240,4 +241,7 @@ for i, corrida in enumerate(valores_capital_acotado):
     plt.title('Frecuencia de tiradas hasta obtener un resultado favorable')
     plt.xticks(range(0, 16))  # Modificar el rango del eje x
     plt.xlim(0, 15)  # Ajustar el límite del eje x
+    plt.axhline(y=500, color='r', linestyle='--')
     plt.show()
+
+    # Graficar la distribución de los valores generados
