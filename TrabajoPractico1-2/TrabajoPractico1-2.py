@@ -73,6 +73,7 @@ def verificar_color(numero):
 if estrategia == 'm':
     for tirada in valores_todas_tiradas:
         valores_capital_corrida = []  # Sublista para almacenar los valores del capital por cada corrida
+        valores_apuesta = []          #Sublista para almacenar los valores de las apuestas por cada tiro
         cap_acotado = 500  # Reiniciar el capital acotado después de cada corrida
         cont = 0  # Reiniciar el contador después de cada corrida
         for valor in tirada:
@@ -81,21 +82,25 @@ if estrategia == 'm':
                     cap_acotado -= apu_inicial
                     cap_acotado += 2 * apu_inicial
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apu_inicial)
                 else:
                     apuesta = min(2 ** cont, cap_acotado)
                     cap_acotado -= apuesta
                     cap_acotado += 2 * apuesta
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apuesta)
                     cont = 0
             else:
                 if cont == 0:
                     cap_acotado -= apu_inicial
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apu_inicial)
                     cont += 1
                 else:
                     apuesta = min(2 ** cont, cap_acotado)
                     cap_acotado -= apuesta
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apuesta)
                     cont += 1
                 if cap_acotado <= 0:
                     cant_bancarrotas += 1
@@ -109,8 +114,10 @@ if estrategia == 'm':
 
 if estrategia == 'd':
     valores_capital_acotado = []  # Lista para almacenar los valores del capital a medida que se realizan las tiradas
+    
     for tirada in valores_todas_tiradas:
         valores_capital_corrida = []  # Sublista para almacenar los valores del capital por cada corrida
+        valores_apuesta = []          #Sublista para almacenar los valores de las apuestas por cada tiro
         cap_acotado = 500  # Reiniciar el capital acotado después de cada corrida
         cont = 0  # Reiniciar el contador después de cada corrida
         for valor in tirada:
@@ -119,22 +126,26 @@ if estrategia == 'd':
                     cap_acotado -= apu_inicial
                     cap_acotado += 2 * apu_inicial
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apu_inicial)
                     cont = 0
                 else:
                     apuesta = min(cont, cap_acotado)
                     cap_acotado -= apuesta
                     cap_acotado += 2 * apuesta
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apuesta)
                     cont = max(0, cont - 1)
             else:
                 if cont == 0:
                     cap_acotado -= apu_inicial
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apu_inicial)
                     cont += 1
                 else:
                     apuesta = min(cont, cap_acotado)
                     cap_acotado -= apuesta
                     valores_capital_corrida.append(cap_acotado)
+                    valores_apuesta.append(apuesta)
                     cont += 1
                 if cap_acotado <= 0:
                     cant_bancarrotas += 1
@@ -146,8 +157,10 @@ if estrategia == 'd':
 # Metodo Fibonacci (si pierde aumenta la apuesta en la suma de los dos anteriores, si gana retrocede dos posiciones en la serie)
 if estrategia == 'f':
     valores_capital_acotado = []  # Lista para almacenar los valores del capital a medida que se realizan las tiradas
+    
     for tirada in valores_todas_tiradas:
         valores_capital_corrida = []  # Sublista para almacenar los valores del capital por cada corrida
+        valores_apuesta = []          #Sublista para almacenar los valores de las apuestas por cada tiro
         cap_acotado = 500  # Reiniciar el capital acotado después de cada corrida
         apuesta_anterior = apu_inicial  # Inicializar la apuesta anterior como la apuesta inicial
         apuesta_actual = apu_inicial  # Inicializar la apuesta actual como la apuesta inicial
@@ -156,10 +169,12 @@ if estrategia == 'f':
                 cap_acotado -= apuesta_actual
                 cap_acotado += 2 * apuesta_actual
                 valores_capital_corrida.append(cap_acotado)
+                valores_apuesta.append(apuesta_actual)
                 apuesta_anterior, apuesta_actual = apuesta_actual, max(apuesta_anterior - 2 * apuesta_actual, apu_inicial)
             else:
                 cap_acotado -= apuesta_actual
                 valores_capital_corrida.append(cap_acotado)
+                valores_apuesta.append(apuesta_actual)
                 apuesta_anterior, apuesta_actual = apuesta_actual, apuesta_anterior + apuesta_actual
                 if cap_acotado <= 0:
                     cant_bancarrotas += 1
@@ -171,6 +186,7 @@ if estrategia == 'f':
 # Método Oscar's Grind (si pierde la apuesta se mantiene, si gana aumenta la apuesta en 1 unidad)
 if estrategia == 'o':
     valores_capital_acotado=[] # Lista para almacenar los valores del capital a medida que se realizan las tiradas
+    valores_apuesta = []          #Sublista para almacenar los valores de las apuestas por cada tiro
     for tirada in valores_todas_tiradas:
         valores_capital_corrida=[] # Sublista que almacena los valores del capital por corrida
         cap_acotado = 500 #Reinicia el capital acotado después de cada corrida
@@ -180,10 +196,12 @@ if estrategia == 'o':
                 cap_acotado -= apuesta
                 cap_acotado += 2 * apuesta
                 valores_capital_corrida.append(cap_acotado)
+                valores_apuesta.append(apuesta)
                 apuesta += 1
             else:
                 cap_acotado -= apuesta
                 valores_capital_corrida.append(cap_acotado)
+                valores_apuesta.append(apuesta)
                 if cap_acotado <= 0:
                     cant_bancarrotas += 1
                     if tipo_capital == 'f':
@@ -193,10 +211,14 @@ if estrategia == 'o':
 
 
 
-
+print("Valores de la ruleta en cada tirada")
 print(valores_todas_tiradas)
 print()
+print("Valores del capital despues de cada tirada")
 print(valores_capital_acotado)
+print()
+print("Valores de cada apuesta despues de cada tirada")
+print(valores_apuesta)
 if tipo_capital == 'f':
     print("la cantidad de bancarrotas fue de: ",cant_bancarrotas)
 
@@ -216,7 +238,8 @@ print("Ganancias por corrida:", ganancias_por_corrida)
 # Crear imagenes de capital_acotado en cada tirada, una imagen por cada corrida
 for i, corrida in enumerate(valores_capital_acotado):
     plt.plot(corrida)
-    plt.axhline(y=500, color='r', linestyle='--')  # Agregar línea horizontal en el valor 500
+    if tipo_capital == 'f':
+        plt.axhline(y=500, color='r', linestyle='--')  # Agregar línea horizontal en el valor 500
     plt.xlabel('Tirada')
     plt.ylabel('Capital Acotado')
     plt.title(f'Corrida {i+1}')
@@ -241,7 +264,12 @@ for i, corrida in enumerate(valores_capital_acotado):
     plt.title('Frecuencia de tiradas hasta obtener un resultado favorable')
     plt.xticks(range(0, 16))  # Modificar el rango del eje x
     plt.xlim(0, 15)  # Ajustar el límite del eje x
-    plt.axhline(y=500, color='r', linestyle='--')
     plt.show()
 
-    # Graficar la distribución de los valores generados
+   # Crear imagenes de apuesta por tiro, una imagen por cada corrida
+
+    plt.plot(valores_apuesta)
+    plt.xlabel('Tirada')
+    plt.ylabel('Valor apuesta')
+    plt.title(f'Corrida {i+1}')
+    plt.show()
