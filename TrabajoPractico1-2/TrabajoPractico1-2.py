@@ -99,10 +99,8 @@ if estrategia == 'm':
                     cont += 1
                 if cap_acotado <= 0:
                     cant_bancarrotas += 1
-                    if cap_acotado <= 0:
-                        cant_bancarrotas += 1
-                        if tipo_capital == 'f':
-                            break  # Se detiene si cap_acotado es cero y el tipo de capital es finito
+                    if tipo_capital == 'f':
+                        break  # Se detiene si cap_acotado es cero y el tipo de capital es finito
             cap_acotado = max(0, cap_acotado)  # Asegurar que cap_acotado no sea negativo
         valores_capital_acotado.append(valores_capital_corrida)
 
