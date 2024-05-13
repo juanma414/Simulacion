@@ -183,13 +183,13 @@ if estrategia == 'f':
             cap_acotado = max(0, cap_acotado)  # Asegurar que cap_acotado no sea negativo
         valores_capital_acotado.append(valores_capital_corrida)
 
-# Método Oscar's Grind (si pierde la apuesta se mantiene, si gana aumenta la apuesta en 1 unidad)
+# Método Oscar's Grind (si pierde la apuesta se mantiene, si gana aumenta la apuesta en 1 unidad hasta sacar ganancia de 1 unidad)
 if estrategia == 'o':
     valores_capital_acotado=[] # Lista para almacenar los valores del capital a medida que se realizan las tiradas
     valores_apuesta = []          #Sublista para almacenar los valores de las apuestas por cada tiro
     for tirada in valores_todas_tiradas:
         valores_capital_corrida=[] # Sublista que almacena los valores del capital por corrida
-        cap_acotado = 500 #Reinicia el capital acotado después de cada corrida
+        capital_inicial = cap_acotado = 500 #Reinicia el capital acotado después de cada corrida y lo iguala al capital inicial para comparación
         apuesta = apu_inicial #Reinicia la apuesta a su valor original
         for valor in tirada:
             if verificar_color(valor):
@@ -197,7 +197,10 @@ if estrategia == 'o':
                 cap_acotado += 2 * apuesta
                 valores_capital_corrida.append(cap_acotado)
                 valores_apuesta.append(apuesta)
-                apuesta += 1
+                if (capital_inicial > cap_acotado):
+                    apuesta += 1
+                else:
+                    apuesta = apu_inicial
             else:
                 cap_acotado -= apuesta
                 valores_capital_corrida.append(cap_acotado)
