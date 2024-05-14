@@ -162,7 +162,7 @@ if estrategia == 'f':
         valores_capital_corrida = []  # Sublista para almacenar los valores del capital por cada corrida
         valores_apuesta = []          #Sublista para almacenar los valores de las apuestas por cada tiro
         cap_acotado = 500  # Reiniciar el capital acotado después de cada corrida
-        apuesta_anterior = apu_inicial  # Inicializar la apuesta anterior como la apuesta inicial
+        apuesta_anterior = 0 # Inicializar la apuesta anterior en 0
         apuesta_actual = apu_inicial  # Inicializar la apuesta actual como la apuesta inicial
         for valor in tirada:
             if verificar_color(valor):
@@ -170,7 +170,9 @@ if estrategia == 'f':
                 cap_acotado += 2 * apuesta_actual
                 valores_capital_corrida.append(cap_acotado)
                 valores_apuesta.append(apuesta_actual)
-                apuesta_anterior, apuesta_actual = apuesta_actual, max(apuesta_anterior - 2 * apuesta_actual, apu_inicial)
+                nueva_apuesta = max(apuesta_actual - apuesta_anterior, apu_inicial)
+                apuesta_anterior = max(apuesta_anterior - nueva_apuesta, 0)
+                apuesta_actual = nueva_apuesta
             else:
                 cap_acotado -= apuesta_actual
                 valores_capital_corrida.append(cap_acotado)
