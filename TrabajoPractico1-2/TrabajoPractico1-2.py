@@ -127,9 +127,8 @@ if estrategia == 'd':
                     cap_acotado += 2 * apu_inicial
                     valores_capital_corrida.append(cap_acotado)
                     valores_apuesta.append(apu_inicial)
-                    cont = 0
                 else:
-                    apuesta = min(cont, cap_acotado)
+                    apuesta = cont
                     cap_acotado -= apuesta
                     cap_acotado += 2 * apuesta
                     valores_capital_corrida.append(cap_acotado)
