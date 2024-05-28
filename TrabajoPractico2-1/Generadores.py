@@ -61,8 +61,8 @@ class MiddleSquare:
         return min_val + (self.next() % (max_val - min_val + 1))
 
 # Crear una instancia del generador
-seed = 15615  # Semilla inicial (Es la semilla de 5 dígitos que genera la secuencia más larga antes de entrar en bucle)
-n_digits = 5  # Número de dígitos de la semilla
+seed = 15349803495615  # Semilla inicial (Es la semilla de 5 dígitos que genera la secuencia más larga antes de entrar en bucle)
+n_digits = 14  # Número de dígitos de la semilla
 ms = MiddleSquare(seed, n_digits)
 lista_cuadrados = ms.next()
 
