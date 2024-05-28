@@ -1,6 +1,9 @@
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 import random
-import scipy
+import pandas as pd # type: ignore
+import scipy # type: ignore
+import numpy as np # type: ignore
+from scipy.stats import chisquare, geom, chi2 # type: ignore
 
 
 #GENERADOR LCG
@@ -22,11 +25,11 @@ class LCG:
 # Crear una instancia del LCG
 lcg = LCG(seed=1)
 
-# Generar una lista de números aleatorios
+# Generar una lista de números aleatorios con el Método LCG
 lista_lcg = [lcg.next_in_range(1, 100) for _ in range(10000)]
 
 #print(random_numbers)
-# Crear un gráfico de dispersión
+# Crear un gráfico de dispersión de los números generados por LCG
 plt.figure(figsize=(10, 6))
 plt.scatter(range(len(lista_lcg)), lista_lcg, s=1)
 plt.title('Números Generados por el LCG')
@@ -36,7 +39,6 @@ plt.show()
 
 
 # METODO DE LOS CUADRADOS 
-
 class MiddleSquare:
     def __init__(self, seed, n_digits):
         self.seed = seed
@@ -59,15 +61,16 @@ class MiddleSquare:
         return min_val + (self.next() % (max_val - min_val + 1))
 
 # Crear una instancia del generador
-seed = 1111  # Semilla inicial
-n_digits = 4  # Número de dígitos de la semilla
+seed = 15615  # Semilla inicial (Es la semilla de 5 dígitos que genera la secuencia más larga antes de entrar en bucle)
+n_digits = 5  # Número de dígitos de la semilla
 ms = MiddleSquare(seed, n_digits)
+lista_cuadrados = ms.next()
 
-# Generar una lista de números aleatorios en el rango 1-100000
+# Generar una lista de números aleatorios con el Método de los Cuadrados
 lista_cuadrados = [ms.next_in_range(1, 100) for _ in range(100000)]
 
 #print(random_numbers)
-# Crear un gráfico de dispersión
+# Crear un gráfico de dispersión de los números generados por MS
 plt.figure(figsize=(10, 6))
 plt.scatter(range(len(lista_cuadrados)), lista_cuadrados, s=1)
 plt.title('Números Generados por el Método de la Parte Media del Cuadrado')
@@ -78,11 +81,11 @@ plt.show()
 
 #METODO RANDOM DE PYTHON
 
-# Generar una lista de números aleatorios entre 1 y 100
+# Generar una lista de números aleatorios con el método por defecto de Python
 lista_python = [random.randint(1, 100) for _ in range(100000)]
 #print(random_numbers)
 
-# Crear un gráfico de dispersión
+# Crear un gráfico de dispersión de los números generados por Python
 plt.figure(figsize=(10, 6))
 plt.scatter(range(len(lista_python)), lista_python, s=1)
 plt.title('Números Generados por random de Python')
@@ -96,9 +99,7 @@ plt.show()
 
 
 # TEST CHI-CUADRADO
-from scipy.stats import chisquare
 # Realizar la prueba Chi-cuadrado
 statistic, p_value = chisquare(lista_lcg)
-
 print("Estadístico de Chi-cuadrado:", statistic)
 print("Valor p:", p_value)
