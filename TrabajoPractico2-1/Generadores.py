@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import random
+import scipy
+
 
 #GENERADOR LCG
 class LCG:
@@ -21,12 +23,12 @@ class LCG:
 lcg = LCG(seed=1)
 
 # Generar una lista de números aleatorios
-random_numbers = [lcg.next_in_range(1, 100) for _ in range(100000)]
+lista_lcg = [lcg.next_in_range(1, 100) for _ in range(10000)]
 
 #print(random_numbers)
 # Crear un gráfico de dispersión
 plt.figure(figsize=(10, 6))
-plt.scatter(range(len(random_numbers)), random_numbers, s=1)
+plt.scatter(range(len(lista_lcg)), lista_lcg, s=1)
 plt.title('Números Generados por el LCG')
 plt.xlabel('Índice')
 plt.ylabel('Número Aleatorio')
@@ -61,13 +63,13 @@ seed = 1111  # Semilla inicial
 n_digits = 4  # Número de dígitos de la semilla
 ms = MiddleSquare(seed, n_digits)
 
-# Generar una lista de números aleatorios en el rango 1-100
-random_numbers = [ms.next_in_range(1, 100) for _ in range(100000)]
+# Generar una lista de números aleatorios en el rango 1-100000
+lista_cuadrados = [ms.next_in_range(1, 100) for _ in range(100000)]
 
 #print(random_numbers)
 # Crear un gráfico de dispersión
 plt.figure(figsize=(10, 6))
-plt.scatter(range(len(random_numbers)), random_numbers, s=1)
+plt.scatter(range(len(lista_cuadrados)), lista_cuadrados, s=1)
 plt.title('Números Generados por el Método de la Parte Media del Cuadrado')
 plt.xlabel('Índice')
 plt.ylabel('Número Aleatorio')
@@ -77,13 +79,26 @@ plt.show()
 #METODO RANDOM DE PYTHON
 
 # Generar una lista de números aleatorios entre 1 y 100
-random_numbers = [random.randint(1, 100) for _ in range(100000)]
+lista_python = [random.randint(1, 100) for _ in range(100000)]
 #print(random_numbers)
 
 # Crear un gráfico de dispersión
 plt.figure(figsize=(10, 6))
-plt.scatter(range(len(random_numbers)), random_numbers, s=1)
+plt.scatter(range(len(lista_python)), lista_python, s=1)
 plt.title('Números Generados por random de Python')
 plt.xlabel('Índice')
 plt.ylabel('Número Aleatorio')
 plt.show()
+
+
+
+#TESTS PARA VERIFICACION DE GENERADORES
+
+
+# TEST CHI-CUADRADO
+from scipy.stats import chisquare
+# Realizar la prueba Chi-cuadrado
+statistic, p_value = chisquare(lista_lcg)
+
+print("Estadístico de Chi-cuadrado:", statistic)
+print("Valor p:", p_value)
