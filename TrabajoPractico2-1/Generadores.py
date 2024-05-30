@@ -3,7 +3,7 @@ import random
 import pandas as pd # type: ignore
 import scipy # type: ignore
 import numpy as np # type: ignore
-from scipy.stats import chisquare, geom, chi2 # type: ignore
+from scipy.stats import chisquare, geom, chi2, chi2_contingency, kstest, norm # type: ignore
 
 
 #GENERADOR LCG
@@ -83,7 +83,9 @@ plt.show()
 
 # Generar una lista de números aleatorios con el método por defecto de Python
 lista_python = [random.randint(1, 100) for _ in range(100000)]
-#print(random_numbers)
+
+#Genera una lista de números aleatorios con el método rand de la librería NumPy
+lista_np = np.random.rand(100000)
 
 # Crear un gráfico de dispersión de los números generados por Python
 plt.figure(figsize=(10, 6))
@@ -99,27 +101,50 @@ plt.show()
 
 
 # TEST CHI-CUADRADO
-# Realizar la prueba Chi-cuadrado
-statistic, p_value = chisquare(lista_lcg)
-print("Estadístico de Chi-cuadrado:", statistic)
-print("Valor p:", p_value)
-
-from scipy.stats import chi2_contingency
-
 # Crear una tabla de contingencia
 contingency_table = pd.crosstab(index=lista_lcg, columns="count")
-
 # Realizar la prueba de Chi-cuadrado
 chi2, p_value, dof, expected = chi2_contingency(contingency_table)
-
 # Imprimir el valor p
 print("Valor p:", p_value)
-
 # Establecer el nivel de significancia
 alpha = 0.05
-
 # Verificar si el valor p es menor que el nivel de significancia
 if p_value < alpha:
     print("Rechazamos la hipótesis nula")
 else:
     print("No rechazamos la hipótesis nula")
+
+
+# Test de Kolmogorov-Smirnov
+d, p_value_ks = kstest(lista_lcg, 'uniform')
+print(f"Kolmogorov-Smirnov Test: D = {d}, p-value = {p_value_ks}")
+
+
+# Test de las corridas (Corridas por encima y debajo de la mediana)
+def runs_test(secuencia):
+    # Calcular la media de la secuencia
+    mean = np.mean(secuencia)
+    # Convertir la secuencia a signos (+1 si por encima de la media, -1 si por debajo)
+    signos = np.where(secuencia > mean, 1, -1)
+    # Contar el número de corridas (cambios de signo)
+    corridas = np.sum(np.diff(signos) != 0) + 1
+    # Contar el número de elementos positivos y negativos
+    n1 = np.sum(signos == 1)
+    n2 = np.sum(signos == -1)
+    # Calcular la media y la varianza de las corridas
+    media_corridas = (2 * n1 * n2) / (n1 + n2) + 1
+    varianza_corridas = (2 * n1 * n2 * (2 * n1 * n2 - n1 - n2)) / ((n1 + n2) ** 2 * (n1 + n2 - 1))
+    # Calcular el estadístico Z
+    z = (corridas - media_corridas) / np.sqrt(varianza_corridas)
+    # Calcular el p-valor asociado
+    p_value = 2 * (1 - norm.cdf(abs(z)))  # Doble cola
+    return corridas, media_corridas, varianza_corridas, z, p_value
+
+# Evalúo la función
+corridas, media_corridas, varianza_corridas, z, p_value = runs_test(lista_lcg)
+print(f"Número de corridas: {corridas}")
+print(f"Número esperado de corridas: {media_corridas}")
+print(f"Varianza de las corridas: {varianza_corridas}")
+print(f"Estadístico Z: {z}")
+print(f"p-value: {p_value}")
