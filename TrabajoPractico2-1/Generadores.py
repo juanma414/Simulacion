@@ -103,3 +103,23 @@ plt.show()
 statistic, p_value = chisquare(lista_lcg)
 print("Estadístico de Chi-cuadrado:", statistic)
 print("Valor p:", p_value)
+
+from scipy.stats import chi2_contingency
+
+# Crear una tabla de contingencia
+contingency_table = pd.crosstab(index=lista_lcg, columns="count")
+
+# Realizar la prueba de Chi-cuadrado
+chi2, p_value, dof, expected = chi2_contingency(contingency_table)
+
+# Imprimir el valor p
+print("Valor p:", p_value)
+
+# Establecer el nivel de significancia
+alpha = 0.05
+
+# Verificar si el valor p es menor que el nivel de significancia
+if p_value < alpha:
+    print("Rechazamos la hipótesis nula")
+else:
+    print("No rechazamos la hipótesis nula")
