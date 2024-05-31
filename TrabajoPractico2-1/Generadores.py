@@ -1,11 +1,11 @@
-import matplotlib.pyplot as plt # type: ignore
+import matplotlib.pyplot as plt 
 import random
-import pandas as pd # type: ignore
-import scipy # type: ignore
-import numpy as np # type: ignore
-from scipy.stats import chisquare, geom, chi2, chi2_contingency, kstest, norm # type: ignore
+import pandas as pd 
+import scipy 
+import numpy as np 
+from scipy.stats import chisquare, kstest , pearsonr
 
-
+#region LCG
 #GENERADOR LCG
 class LCG:
     def __init__(self, seed, a=1664525, c=1013904223, m=2**32):
@@ -21,14 +21,13 @@ class LCG:
     def next_in_range(self, min_val, max_val):
         return min_val + (self.next() % (max_val - min_val + 1))
 
-
 # Crear una instancia del LCG
 lcg = LCG(seed=1)
 
 # Generar una lista de números aleatorios con el Método LCG
-lista_lcg = [lcg.next_in_range(1, 100) for _ in range(10000)]
+lista_lcg = [lcg.next_in_range(1, 100) for _ in range(1000)]
 
-#print(random_numbers)
+
 # Crear un gráfico de dispersión de los números generados por LCG
 plt.figure(figsize=(10, 6))
 plt.scatter(range(len(lista_lcg)), lista_lcg, s=1)
@@ -38,7 +37,9 @@ plt.ylabel('Número Aleatorio')
 plt.show()
 
 
-# METODO DE LOS CUADRADOS 
+# endregion
+
+#region METODO DE LOS CUADRADOS 
 class MiddleSquare:
     def __init__(self, seed, n_digits):
         self.seed = seed
@@ -61,15 +62,14 @@ class MiddleSquare:
         return min_val + (self.next() % (max_val - min_val + 1))
 
 # Crear una instancia del generador
-seed = 15349803495615  # Semilla inicial (Es la semilla de 5 dígitos que genera la secuencia más larga antes de entrar en bucle)
+seed = 15349803495615  # Semilla inicial 
 n_digits = 14  # Número de dígitos de la semilla
 ms = MiddleSquare(seed, n_digits)
 lista_cuadrados = ms.next()
 
 # Generar una lista de números aleatorios con el Método de los Cuadrados
-lista_cuadrados = [ms.next_in_range(1, 100) for _ in range(100000)]
+lista_cuadrados = [ms.next_in_range(1, 100) for _ in range(1000)]
 
-#print(random_numbers)
 # Crear un gráfico de dispersión de los números generados por MS
 plt.figure(figsize=(10, 6))
 plt.scatter(range(len(lista_cuadrados)), lista_cuadrados, s=1)
@@ -77,15 +77,12 @@ plt.title('Números Generados por el Método de la Parte Media del Cuadrado')
 plt.xlabel('Índice')
 plt.ylabel('Número Aleatorio')
 plt.show()
+#endregion
 
-
-#METODO RANDOM DE PYTHON
+#region METODO RANDOM DE PYTHON
 
 # Generar una lista de números aleatorios con el método por defecto de Python
-lista_python = [random.randint(1, 100) for _ in range(100000)]
-
-#Genera una lista de números aleatorios con el método rand de la librería NumPy
-lista_np = np.random.rand(100000)
+lista_python = [random.randint(1, 100) for _ in range(1000)]
 
 # Crear un gráfico de dispersión de los números generados por Python
 plt.figure(figsize=(10, 6))
@@ -94,57 +91,224 @@ plt.title('Números Generados por random de Python')
 plt.xlabel('Índice')
 plt.ylabel('Número Aleatorio')
 plt.show()
+#endregion
+
+
+#region TESTS PARA LCG
+ 
+ #TESTS PARA VERIFICACION DE GENERADORES
+
+# Prueba de frecuencia (Chi-cuadrado)
+# Definir los intervalos (bins)
+observed_freq, _ = np.histogram(lista_lcg, bins=range(1, 102))  # 100 bins de tamaño 1 (1-100)
+expected_freq = np.full_like(observed_freq, len(lista_lcg) / 100)
+
+# Realizar la prueba de chi-cuadrado
+chi2_stat, p_val_chi2 = chisquare(observed_freq, expected_freq)
+
+print(f"Prueba de frecuencia (Chi-cuadrado): estadístico={chi2_stat}, p-valor={p_val_chi2}")
 
 
 
-#TESTS PARA VERIFICACION DE GENERADORES
+# Prueba de Kolmogorov-Smirnov
+# Convertir la lista de números LCG a una escala [0, 1]
+lista_lcg_normalized = [x / 100 for x in lista_lcg]
+
+# Realizar la prueba de Kolmogorov-Smirnov
+ks_stat, p_val_ks = kstest(lista_lcg_normalized, 'uniform')
+print(f"Prueba de Kolmogorov-Smirnov: estadístico={ks_stat}, p-valor={p_val_ks}")
 
 
-# TEST CHI-CUADRADO
-# Crear una tabla de contingencia
-contingency_table = pd.crosstab(index=lista_lcg, columns="count")
-# Realizar la prueba de Chi-cuadrado
-chi2, p_value, dof, expected = chi2_contingency(contingency_table)
-# Imprimir el valor p
-print("Valor p:", p_value)
-# Establecer el nivel de significancia
-alpha = 0.05
-# Verificar si el valor p es menor que el nivel de significancia
-if p_value < alpha:
-    print("Rechazamos la hipótesis nula")
-else:
-    print("No rechazamos la hipótesis nula")
+
+def run_test(sequence):
+    runs, n1, n2 = 0, 0, 0
+    for i in range(1, len(sequence)):
+        if sequence[i] >= 50:
+            n1 += 1
+        else:
+            n2 += 1
+        if sequence[i] >= 50 and sequence[i-1] < 50 or sequence[i] < 50 and sequence[i-1] >= 50:
+            runs += 1
+    runs += 1  # incluir el primer segmento
+    return runs, n1, n2
+
+runs, n1, n2 = run_test(lista_lcg)
+expected_runs = ((2 * n1 * n2) / (n1 + n2)) + 1
+var_runs = (2 * n1 * n2 * (2 * n1 * n2 - n1 - n2)) / (((n1 + n2) ** 2) * (n1 + n2 - 1))
+z = (runs - expected_runs) / np.sqrt(var_runs)
+p_val_runs = 2 * (1 - scipy.stats.norm.cdf(abs(z)))
+print(f"Prueba de secuencias: estadístico={z}, p-valor={p_val_runs}")
 
 
-# Test de Kolmogorov-Smirnov
-d, p_value_ks = kstest(lista_lcg, 'uniform')
-print(f"Kolmogorov-Smirnov Test: D = {d}, p-value = {p_value_ks}")
+# Prueba de autocorrelación con lag 1
+lag = 1
+autocorr, p_val_autocorr = pearsonr(lista_lcg[:-lag], lista_lcg[lag:])
+print(f"Prueba de autocorrelación: autocorrelación={autocorr}, p-valor={p_val_autocorr}")
 
 
-# Test de las corridas (Corridas por encima y debajo de la mediana)
-def runs_test(secuencia):
-    # Calcular la media de la secuencia
-    mean = np.mean(secuencia)
-    # Convertir la secuencia a signos (+1 si por encima de la media, -1 si por debajo)
-    signos = np.where(secuencia > mean, 1, -1)
-    # Contar el número de corridas (cambios de signo)
-    corridas = np.sum(np.diff(signos) != 0) + 1
-    # Contar el número de elementos positivos y negativos
-    n1 = np.sum(signos == 1)
-    n2 = np.sum(signos == -1)
-    # Calcular la media y la varianza de las corridas
-    media_corridas = (2 * n1 * n2) / (n1 + n2) + 1
-    varianza_corridas = (2 * n1 * n2 * (2 * n1 * n2 - n1 - n2)) / ((n1 + n2) ** 2 * (n1 + n2 - 1))
-    # Calcular el estadístico Z
-    z = (corridas - media_corridas) / np.sqrt(varianza_corridas)
-    # Calcular el p-valor asociado
-    p_value = 2 * (1 - norm.cdf(abs(z)))  # Doble cola
-    return corridas, media_corridas, varianza_corridas, z, p_value
+def series_test(numbers, bins=10):
+    # Crear una matriz de frecuencias observadas
+    counts, xedges, yedges = np.histogram2d(numbers[:-1], numbers[1:], bins=bins)
+    
+    # Asegurarse de que las frecuencias observadas y esperadas coincidan en la suma
+    total_count = np.sum(counts)
+    expected_count = total_count / (bins * bins)
+    
+    # Aplanar las matrices para la prueba de chi-cuadrado
+    observed_freq = counts.flatten()
+    expected_freq = np.full_like(observed_freq, expected_count)
+    
+    # Realizar la prueba de chi-cuadrado
+    chi2_stat, p_val_series = chisquare(observed_freq, expected_freq)
+    return chi2_stat, p_val_series
 
-# Evalúo la función
-corridas, media_corridas, varianza_corridas, z, p_value = runs_test(lista_lcg)
-print(f"Número de corridas: {corridas}")
-print(f"Número esperado de corridas: {media_corridas}")
-print(f"Varianza de las corridas: {varianza_corridas}")
-print(f"Estadístico Z: {z}")
-print(f"p-value: {p_value}")
+chi2_series, p_val_series = series_test(lista_lcg, bins=10)
+print(f"Prueba de la serie: estadístico={chi2_series}, p-valor={p_val_series}")
+
+#endregion
+
+#region TESTS PARA CUADRADOS
+
+ #TESTS PARA VERIFICACION DE GENERADORES
+
+# Prueba de frecuencia (Chi-cuadrado)
+# Definir los intervalos (bins)
+observed_freq, _ = np.histogram(lista_cuadrados, bins=range(1, 102))  # 100 bins de tamaño 1 (1-100)
+expected_freq = np.full_like(observed_freq, len(lista_cuadrados) / 100)
+
+# Realizar la prueba de chi-cuadrado
+chi2_stat, p_val_chi2 = chisquare(observed_freq, expected_freq)
+
+print(f"Prueba de frecuencia (Chi-cuadrado): estadístico={chi2_stat}, p-valor={p_val_chi2}")
+
+
+
+# Prueba de Kolmogorov-Smirnov
+# Convertir la lista de números LCG a una escala [0, 1]
+lista_cuadrados_normalized = [x / 100 for x in lista_cuadrados]
+
+# Realizar la prueba de Kolmogorov-Smirnov
+ks_stat, p_val_ks = kstest(lista_cuadrados_normalized, 'uniform')
+print(f"Prueba de Kolmogorov-Smirnov: estadístico={ks_stat}, p-valor={p_val_ks}")
+
+
+
+def run_test(sequence):
+    runs, n1, n2 = 0, 0, 0
+    for i in range(1, len(sequence)):
+        if sequence[i] >= 50:
+            n1 += 1
+        else:
+            n2 += 1
+        if sequence[i] >= 50 and sequence[i-1] < 50 or sequence[i] < 50 and sequence[i-1] >= 50:
+            runs += 1
+    runs += 1  # incluir el primer segmento
+    return runs, n1, n2
+
+runs, n1, n2 = run_test(lista_cuadrados)
+expected_runs = ((2 * n1 * n2) / (n1 + n2)) + 1
+var_runs = (2 * n1 * n2 * (2 * n1 * n2 - n1 - n2)) / (((n1 + n2) ** 2) * (n1 + n2 - 1))
+z = (runs - expected_runs) / np.sqrt(var_runs)
+p_val_runs = 2 * (1 - scipy.stats.norm.cdf(abs(z)))
+print(f"Prueba de secuencias: estadístico={z}, p-valor={p_val_runs}")
+
+
+# Prueba de autocorrelación con lag 1
+lag = 1
+autocorr, p_val_autocorr = pearsonr(lista_cuadrados[:-lag], lista_cuadrados[lag:])
+print(f"Prueba de autocorrelación: autocorrelación={autocorr}, p-valor={p_val_autocorr}")
+
+
+def series_test(numbers, bins=10):
+    # Crear una matriz de frecuencias observadas
+    counts, xedges, yedges = np.histogram2d(numbers[:-1], numbers[1:], bins=bins)
+    
+    # Asegurarse de que las frecuencias observadas y esperadas coincidan en la suma
+    total_count = np.sum(counts)
+    expected_count = total_count / (bins * bins)
+    
+    # Aplanar las matrices para la prueba de chi-cuadrado
+    observed_freq = counts.flatten()
+    expected_freq = np.full_like(observed_freq, expected_count)
+    
+    # Realizar la prueba de chi-cuadrado
+    chi2_stat, p_val_series = chisquare(observed_freq, expected_freq)
+    return chi2_stat, p_val_series
+
+chi2_series, p_val_series = series_test(lista_cuadrados, bins=10)
+print(f"Prueba de la serie: estadístico={chi2_series}, p-valor={p_val_series}")
+
+#endregion
+
+#region TESTS PARA RANDOM DE PYTHON
+
+ #TESTS PARA VERIFICACION DE GENERADORES
+
+# Prueba de frecuencia (Chi-cuadrado)
+# Definir los intervalos (bins)
+observed_freq, _ = np.histogram(lista_python, bins=range(1, 102))  # 100 bins de tamaño 1 (1-100)
+expected_freq = np.full_like(observed_freq, len(lista_python) / 100)
+
+# Realizar la prueba de chi-cuadrado
+chi2_stat, p_val_chi2 = chisquare(observed_freq, expected_freq)
+
+print(f"Prueba de frecuencia (Chi-cuadrado): estadístico={chi2_stat}, p-valor={p_val_chi2}")
+
+
+
+# Prueba de Kolmogorov-Smirnov
+# Convertir la lista de números LCG a una escala [0, 1]
+lista_python_normalized = [x / 100 for x in lista_python]
+
+# Realizar la prueba de Kolmogorov-Smirnov
+ks_stat, p_val_ks = kstest(lista_python_normalized, 'uniform')
+print(f"Prueba de Kolmogorov-Smirnov: estadístico={ks_stat}, p-valor={p_val_ks}")
+
+
+
+def run_test(sequence):
+    runs, n1, n2 = 0, 0, 0
+    for i in range(1, len(sequence)):
+        if sequence[i] >= 50:
+            n1 += 1
+        else:
+            n2 += 1
+        if sequence[i] >= 50 and sequence[i-1] < 50 or sequence[i] < 50 and sequence[i-1] >= 50:
+            runs += 1
+    runs += 1  # incluir el primer segmento
+    return runs, n1, n2
+
+runs, n1, n2 = run_test(lista_python)
+expected_runs = ((2 * n1 * n2) / (n1 + n2)) + 1
+var_runs = (2 * n1 * n2 * (2 * n1 * n2 - n1 - n2)) / (((n1 + n2) ** 2) * (n1 + n2 - 1))
+z = (runs - expected_runs) / np.sqrt(var_runs)
+p_val_runs = 2 * (1 - scipy.stats.norm.cdf(abs(z)))
+print(f"Prueba de secuencias: estadístico={z}, p-valor={p_val_runs}")
+
+
+# Prueba de autocorrelación con lag 1
+lag = 1
+autocorr, p_val_autocorr = pearsonr(lista_python[:-lag], lista_python[lag:])
+print(f"Prueba de autocorrelación: autocorrelación={autocorr}, p-valor={p_val_autocorr}")
+
+
+def series_test(numbers, bins=10):
+    # Crear una matriz de frecuencias observadas
+    counts, xedges, yedges = np.histogram2d(numbers[:-1], numbers[1:], bins=bins)
+    
+    # Asegurarse de que las frecuencias observadas y esperadas coincidan en la suma
+    total_count = np.sum(counts)
+    expected_count = total_count / (bins * bins)
+    
+    # Aplanar las matrices para la prueba de chi-cuadrado
+    observed_freq = counts.flatten()
+    expected_freq = np.full_like(observed_freq, expected_count)
+    
+    # Realizar la prueba de chi-cuadrado
+    chi2_stat, p_val_series = chisquare(observed_freq, expected_freq)
+    return chi2_stat, p_val_series
+
+chi2_series, p_val_series = series_test(lista_python, bins=10)
+print(f"Prueba de la serie: estadístico={chi2_series}, p-valor={p_val_series}")
+
+#endregion
