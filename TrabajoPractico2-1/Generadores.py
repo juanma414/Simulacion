@@ -25,7 +25,7 @@ class LCG:
 lcg = LCG(seed=1)
 
 # Generar una lista de números aleatorios con el Método LCG
-lista_lcg = [lcg.next_in_range(1, 100) for _ in range(1000)]
+lista_lcg = [lcg.next_in_range(1, 100) for _ in range(100000)]
 
 
 # Crear un gráfico de dispersión de los números generados por LCG
@@ -68,7 +68,7 @@ ms = MiddleSquare(seed, n_digits)
 lista_cuadrados = ms.next()
 
 # Generar una lista de números aleatorios con el Método de los Cuadrados
-lista_cuadrados = [ms.next_in_range(1, 100) for _ in range(1000)]
+lista_cuadrados = [ms.next_in_range(1, 100) for _ in range(100000)]
 
 # Crear un gráfico de dispersión de los números generados por MS
 plt.figure(figsize=(10, 6))
@@ -82,7 +82,7 @@ plt.show()
 #region METODO RANDOM DE PYTHON
 
 # Generar una lista de números aleatorios con el método por defecto de Python
-lista_python = [random.randint(1, 100) for _ in range(1000)]
+lista_python = [random.randint(1, 100) for _ in range(100000)]
 
 # Crear un gráfico de dispersión de los números generados por Python
 plt.figure(figsize=(10, 6))
@@ -92,7 +92,6 @@ plt.xlabel('Índice')
 plt.ylabel('Número Aleatorio')
 plt.show()
 #endregion
-
 
 #region TESTS PARA LCG
  
@@ -311,4 +310,58 @@ def series_test(numbers, bins=10):
 chi2_series, p_val_series = series_test(lista_python, bins=10)
 print(f"Prueba de la serie: estadístico={chi2_series}, p-valor={p_val_series}")
 
+#endregion
+
+#region HISTOGRAMAS
+
+#GRAFICA DE DISTRIBUCIONES LCG 
+# Configurar el diseño del gráfico
+plt.figure(figsize=(10, 6))
+
+# Generar el histograma para el generador LCG
+plt.hist(lista_lcg, bins=range(1, 102), alpha=0.7, color='blue', edgecolor='black', label='LCG')
+
+# Configurar etiquetas y título
+plt.xlabel('Número Aleatorio')
+plt.ylabel('Frecuencia')
+plt.title('Distribución de Números Aleatorios Generados por el LCG')
+plt.legend()
+
+# Mostrar el gráfico
+plt.grid(True)
+plt.show()
+
+#GRAFICA DE DISTRIBUCIONES METODO DE LOS CUADRADOS
+# Configurar el diseño del gráfico
+plt.figure(figsize=(10, 6))
+
+# Generar el histograma para el generador de los cuadrados
+plt.hist(lista_cuadrados, bins=range(1, 102), alpha=0.7, color='blue', edgecolor='black', label='Metodo de los cuadrados')
+
+# Configurar etiquetas y título
+plt.xlabel('Número Aleatorio')
+plt.ylabel('Frecuencia')
+plt.title('Distribución de Números Aleatorios Generados por el generador de los cuadrados')
+plt.legend()
+
+# Mostrar el gráfico
+plt.grid(True)
+plt.show()
+
+#GRAFICA DE DISTRIBUCIONES RANDOM
+# Configurar el diseño del gráfico
+plt.figure(figsize=(10, 6))
+
+# Generar el histograma para el generador Random de Python
+plt.hist(lista_python, bins=range(1, 102), alpha=0.7, color='blue', edgecolor='black', label='Método Random de python')
+
+# Configurar etiquetas y título
+plt.xlabel('Número Aleatorio')
+plt.ylabel('Frecuencia')
+plt.title('Distribución de Números Aleatorios Generados por el generador Random de python')
+plt.legend()
+
+# Mostrar el gráfico
+plt.grid(True)
+plt.show()
 #endregion
