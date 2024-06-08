@@ -1,9 +1,9 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt  # type: ignore
 import random
-import pandas as pd 
-import scipy 
-import numpy as np 
-from scipy.stats import chisquare, kstest , pearsonr
+import pandas as pd   # type: ignore
+import scipy   # type: ignore
+import numpy as np   # type: ignore
+from scipy.stats import chisquare, kstest , pearsonr  # type: ignore
 
 #region LCG
 #GENERADOR LCG
