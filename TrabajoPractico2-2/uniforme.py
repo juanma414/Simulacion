@@ -1,19 +1,42 @@
 import numpy as np # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 
-#Distribución uniforme
-def generar_uniforme(a, b, size=1):
-    u = np.random.uniform(0, 1, size)
-    print (u)
-    print (u*b)
+#Transformada Inversa
+def generar_inversa(a, b, tamanio):
+    u = np.random.uniform(0, 1, tamanio)
     return a + u * (b - a)
 
-# Generar valores
-valores_uniformes = generar_uniforme(0, 10, 10000)
+#Método del Rechazo
+def generar_rechazo(a, b, tamanio):
+    muestras=[]
+    while (len(muestras) < tamanio):
+        x = np.random.uniform(a,b)
+        u = np.random.uniform(0,1)
+        if u <= 1:
+            muestras.append(x)
+    return np.array(muestras)
 
-# Visualización
-plt.hist(valores_uniformes, bins=50, density=True)
-plt.title('Histograma de valores uniformemente distribuidos')
+# Generar valores
+valores_inversa = generar_inversa(0, 10, 10000)
+valores_rechazo = generar_rechazo(0, 10, 10000)
+
+# Visualizacion Inversa
+plt.hist(valores_inversa, bins=50, density=True)
+plt.title('Transformada Inversa')
+plt.xlabel('Valor')
+plt.ylabel('Densidad')
+plt.show()
+
+# Visualizacion Rechazo
+plt.hist(valores_rechazo, bins=50, density=True)
+plt.title('Metodo del Rechazo')
+plt.xlabel('Valor')
+plt.ylabel('Densidad')
+plt.show()
+
+# Visualizacion Python
+plt.hist((np.random.uniform(0,10,10000)), bins=50, density=True)
+plt.title('Generado por Python')
 plt.xlabel('Valor')
 plt.ylabel('Densidad')
 plt.show()
