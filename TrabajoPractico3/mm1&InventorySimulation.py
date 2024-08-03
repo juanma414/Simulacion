@@ -1,4 +1,8 @@
 import random
+import matplotlib.pyplot as plt
+
+# Lista para almacenar los resultados de las simulaciones
+resultados_simulaciones = []
 
 class MM1Simulation:
     def __init__(self, arrival_rate, service_rate):
@@ -9,77 +13,143 @@ class MM1Simulation:
         self.total_time_in_system = 0
         self.total_time_in_queue = 0
         self.total_denial_probability = 0
+        self.arrival_times = []  # Lista para almacenar los tiempos de llegada de los clientes
 
     def run(self, simulation_time):
-        for _ in range(simulation_time):
+        for current_time in range(simulation_time):
             if random.random() < self.arrival_rate:
-                self.queue.append(1)
+                self.queue.append(current_time)  # Almacenar el tiempo de llegada
+                self.arrival_times.append(current_time)
             if random.random() < self.service_rate and self.queue:
-                self.queue.pop(0)
+                arrival_time = self.queue.pop(0)
                 self.total_customers += 1
-                self.total_time_in_system += 1
+                time_in_system = current_time - arrival_time
+                self.total_time_in_system += time_in_system
                 self.total_time_in_queue += len(self.queue)
                 self.total_denial_probability += int(len(self.queue) > 0)
 
         avg_customers_in_system = self.total_customers / simulation_time
         avg_customers_in_queue = self.total_time_in_queue / simulation_time
-        avg_time_in_system = self.total_time_in_system / self.total_customers
-        avg_time_in_queue = self.total_time_in_queue / self.total_customers
+        avg_time_in_system = self.total_time_in_system / self.total_customers if self.total_customers > 0 else 0
+        avg_time_in_queue = self.total_time_in_queue / self.total_customers if self.total_customers > 0 else 0
         server_utilization = self.total_customers / simulation_time
         denial_probability = self.total_denial_probability / simulation_time
 
         return avg_customers_in_system, avg_customers_in_queue, avg_time_in_system, avg_time_in_queue, server_utilization, denial_probability
 
-class InventorySimulation:
-    def __init__(self, order_cost, holding_cost, shortage_cost):
-        self.order_cost = order_cost
-        self.holding_cost = holding_cost
-        self.shortage_cost = shortage_cost
-        self.total_cost = 0
+# Solicitar al usuario que ingrese la tasa de arribo
+input_rate = input("Ingrese la tasa de arribo (25/50/75/100/125 %): ")
 
-    def run(self, simulation_time):
-        for _ in range(simulation_time):
-            demand = random.randint(0, 100)
-            order_quantity = random.randint(0, 100)
-            inventory = order_quantity
+# Convertir la entrada a un valor numérico
+try:
+    input_rate = int(input_rate)
+except ValueError:
+    print("Por favor, ingrese un valor numérico válido.")
+    exit(1)
 
-            if demand > inventory:
-                self.total_cost += self.order_cost + self.holding_cost * (demand - inventory)
-            else:
-                self.total_cost += self.holding_cost * (inventory - demand) + self.shortage_cost * (demand - inventory)
+# Asignar el valor correspondiente a arrival_rate
+if input_rate == 25:
+    arrival_rate = 0.1
+elif input_rate == 50:
+    arrival_rate = 0.2
+elif input_rate == 75:
+    arrival_rate = 0.3
+elif input_rate == 100:
+    arrival_rate = 0.4
+elif input_rate == 125:
+    arrival_rate = 0.5
+else:
+    print("Por favor, ingrese uno de los valores especificados (25/50/75/100/125).")
+    exit(1)
+    
+# Define the function simulacion_mm1
+def simulacion_mm1():
+    # MM1 Simulation
+    arrival_rate = 0.5 #random.uniform(0.25, 1.25)
+    service_rate = 0.4
+    simulation_time = 1000
+    mm1_sim = MM1Simulation(arrival_rate, service_rate)
+    avg_customers_in_system, avg_customers_in_queue, avg_time_in_system, avg_time_in_queue, server_utilization, denial_probability = mm1_sim.run(simulation_time)
 
-        avg_order_cost = self.order_cost
-        avg_holding_cost = self.holding_cost
-        avg_shortage_cost = self.shortage_cost
-        total_cost = self.total_cost
+    resultado = {
+        'avg_customers_in_system': avg_customers_in_system,
+        'avg_customers_in_queue': avg_customers_in_queue,
+        'avg_time_in_system': avg_time_in_system,
+        'avg_time_in_queue': avg_time_in_queue,
+        'server_utilization': server_utilization,
+        'denial_probability': denial_probability
+        
+    }
 
-        return avg_order_cost, avg_holding_cost, avg_shortage_cost, total_cost
+    return resultado
+# Realizar 10 corridas de la simulación
+for i in range(10):
+    # Ejecutar la simulación
+    resultado = simulacion_mm1()
+    if resultado is not None:
+        resultados_simulaciones.append(resultado)
+    
+# Inicializar listas para cada métrica
+promedio_clientes_sistema = []
+promedio_clientes_cola = []
+tiempo_promedio_sistema = []
+tiempo_promedio_cola = []
+utilizacion_servidor = []
+probabilidad_denegacion = []
 
-# MM1 Simulation
-arrival_rate = 0.5 #esto deberiamos variarlo de 255 50% 75% 100% 125%
-service_rate = 0.4
-simulation_time = 1000
-mm1_sim = MM1Simulation(arrival_rate, service_rate)
-avg_customers_in_system, avg_customers_in_queue, avg_time_in_system, avg_time_in_queue, server_utilization, denial_probability = mm1_sim.run(simulation_time)
+# Extraer los datos para cada métrica, verificando la existencia de las claves
+for res in resultados_simulaciones:
+    if 'avg_customers_in_system' in res:
+        promedio_clientes_sistema.append(res['avg_customers_in_system'])
+    if 'avg_customers_in_queue' in res:
+        promedio_clientes_cola.append(res['avg_customers_in_queue'])
+    if 'avg_time_in_system' in res:
+        tiempo_promedio_sistema.append(res['avg_time_in_system'])
+    if 'avg_time_in_queue' in res:
+        tiempo_promedio_cola.append(res['avg_time_in_queue'])
+    if 'server_utilization' in res:
+        utilizacion_servidor.append(res['server_utilization'])
+    if 'denial_probability' in res:
+        probabilidad_denegacion.append(res['denial_probability'])
 
-print("Resultados de la simulación MM1:")
-print("Promedio de clientes en el sistema:", avg_customers_in_system)
-print("Promedio de clientes en la cola:", avg_customers_in_queue)
-print("Tiempo promedio en el sistema:", avg_time_in_system)
-print("Tiempo promedio en la cola:", avg_time_in_queue)
-print("Utilización del servidor:", server_utilization)
-print("Probabilidad de denegación:", denial_probability)
+# Crear un gráfico con 6 subgráficos
 
-# Inventory Simulation
-order_cost = 10
-holding_cost = 2
-shortage_cost = 5
-simulation_time = 1000
-inventory_sim = InventorySimulation(order_cost, holding_cost, shortage_cost)
-avg_order_cost, avg_holding_cost, avg_shortage_cost, total_cost = inventory_sim.run(simulation_time)
 
-print("Resultados de la simulación de inventario:")
-print("Costo promedio de orden:", avg_order_cost)
-print("Costo promedio de almacenamiento:", avg_holding_cost)
-print("Costo promedio de escasez:", avg_shortage_cost)
-print("Costo total:", total_cost)
+# Promedio de clientes en el sistema
+plt.plot(promedio_clientes_sistema, marker='o')
+plt.title('Promedio de clientes en el sistema')
+plt.xlabel('Corrida')
+plt.ylabel('Promedio de clientes')
+plt.show()
+
+# Promedio de clientes en la cola
+plt.plot(promedio_clientes_cola, marker='o')
+plt.title('Promedio de clientes en la cola')
+plt.xlabel('Corrida')
+plt.ylabel('Promedio de clientes')
+plt.show()
+# Tiempo promedio en el sistema
+plt.plot(tiempo_promedio_sistema, marker='o')
+plt.title('Tiempo promedio en el sistema')
+plt.xlabel('Corrida')
+plt.ylabel('Tiempo promedio')
+plt.show()
+# Tiempo promedio en la cola
+plt.plot(tiempo_promedio_cola, marker='o')
+plt.title('Tiempo promedio en la cola')
+plt.xlabel('Corrida')
+plt.ylabel('Tiempo promedio')
+plt.show()
+# Utilización del servidor
+plt.plot(utilizacion_servidor, marker='o')
+plt.title('Utilización del servidor')
+plt.xlabel('Corrida')
+plt.ylabel('Utilización')
+plt.show()
+# Probabilidad de denegación de servicio
+plt.plot(probabilidad_denegacion, marker='o')
+plt.title('Probabilidad de denegación de servicio')
+plt.xlabel('Corrida')
+plt.ylabel('Probabilidad')
+plt.show()
+
