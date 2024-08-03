@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #PYTHON 2.7
-#TEORÍA DE COLAS M/M/1 por Simón Salvo Pino
+#TEORÍA DE COLAS M/M/1 
 
 from math import exp
 
