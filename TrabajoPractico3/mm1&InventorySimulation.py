@@ -56,19 +56,19 @@ class InventorySimulation:
         return avg_order_cost, avg_holding_cost, avg_shortage_cost, total_cost
 
 # MM1 Simulation
-arrival_rate = 0.5
+arrival_rate = 0.5 #esto deberiamos variarlo de 255 50% 75% 100% 125%
 service_rate = 0.4
 simulation_time = 1000
 mm1_sim = MM1Simulation(arrival_rate, service_rate)
 avg_customers_in_system, avg_customers_in_queue, avg_time_in_system, avg_time_in_queue, server_utilization, denial_probability = mm1_sim.run(simulation_time)
 
-print("MM1 Simulation Results:")
-print("Average Customers in System:", avg_customers_in_system)
-print("Average Customers in Queue:", avg_customers_in_queue)
-print("Average Time in System:", avg_time_in_system)
-print("Average Time in Queue:", avg_time_in_queue)
-print("Server Utilization:", server_utilization)
-print("Denial Probability:", denial_probability)
+print("Resultados de la simulación MM1:")
+print("Promedio de clientes en el sistema:", avg_customers_in_system)
+print("Promedio de clientes en la cola:", avg_customers_in_queue)
+print("Tiempo promedio en el sistema:", avg_time_in_system)
+print("Tiempo promedio en la cola:", avg_time_in_queue)
+print("Utilización del servidor:", server_utilization)
+print("Probabilidad de denegación:", denial_probability)
 
 # Inventory Simulation
 order_cost = 10
@@ -78,8 +78,8 @@ simulation_time = 1000
 inventory_sim = InventorySimulation(order_cost, holding_cost, shortage_cost)
 avg_order_cost, avg_holding_cost, avg_shortage_cost, total_cost = inventory_sim.run(simulation_time)
 
-print("Inventory Simulation Results:")
-print("Average Order Cost:", avg_order_cost)
-print("Average Holding Cost:", avg_holding_cost)
-print("Average Shortage Cost:", avg_shortage_cost)
-print("Total Cost:", total_cost)
+print("Resultados de la simulación de inventario:")
+print("Costo promedio de orden:", avg_order_cost)
+print("Costo promedio de almacenamiento:", avg_holding_cost)
+print("Costo promedio de escasez:", avg_shortage_cost)
+print("Costo total:", total_cost)
