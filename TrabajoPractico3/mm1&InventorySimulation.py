@@ -67,7 +67,7 @@ def simulacion_mm1():
     # MM1 Simulation
     arrival_rate = 0.5 #random.uniform(0.25, 1.25)
     service_rate = 0.4
-    simulation_time = 1000
+    simulation_time = 100
     mm1_sim = MM1Simulation(arrival_rate, service_rate)
     avg_customers_in_system, avg_customers_in_queue, avg_time_in_system, avg_time_in_queue, server_utilization, denial_probability = mm1_sim.run(simulation_time)
 
