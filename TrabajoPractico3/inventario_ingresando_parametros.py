@@ -73,27 +73,31 @@ def plot_results(results, simulation_time):
     plt.legend()
     plt.show()
 
-# Parámetros de simulación de inventario
-order_cost = 9
-holding_cost = 2
-shortage_cost = 5
-reorder_point = 20  # Punto de reorden
-order_quantity = 50  # Cantidad de pedido
-initial_inventory = 30  # Inventario inicial
-simulation_time = 1000
-num_runs = 10
+def main():
+    print("Ingrese los parámetros de simulación:")
+    order_cost = float(input("Costo de orden: "))
+    holding_cost = float(input("Costo de mantenimiento: "))
+    shortage_cost = float(input("Costo de escasez: "))
+    reorder_point = int(input("Punto de reorden: "))
+    order_quantity = int(input("Cantidad de pedido: "))
+    initial_inventory = int(input("Inventario inicial: "))
+    simulation_time = int(input("Tiempo de simulación (días): "))
+    num_runs = int(input("Número de corridas: "))
 
-# Ejecutar múltiples simulaciones
-results = run_multiple_simulations(order_cost, holding_cost, shortage_cost, reorder_point, order_quantity, initial_inventory, simulation_time, num_runs)
+    # Ejecutar múltiples simulaciones
+    results = run_multiple_simulations(order_cost, holding_cost, shortage_cost, reorder_point, order_quantity, initial_inventory, simulation_time, num_runs)
 
-# Mostrar los resultados
-for i, (_, (avg_order_cost, avg_holding_cost, avg_shortage_cost, total_cost)) in enumerate(results, 1):
-    print(f"Resultados de la simulación {i}:")
-    print("Costo promedio de orden:", avg_order_cost)
-    print("Costo promedio de almacenamiento:", avg_holding_cost)
-    print("Costo promedio de escasez:", avg_shortage_cost)
-    print("Costo total:", total_cost)
-    print("---------------------------------------------------")
+    # Mostrar los resultados
+    for i, (_, (avg_order_cost, avg_holding_cost, avg_shortage_cost, total_cost)) in enumerate(results, 1):
+        print(f"\nResultados de la simulación {i}:")
+        print("Costo promedio de orden:", avg_order_cost)
+        print("Costo promedio de almacenamiento:", avg_holding_cost)
+        print("Costo promedio de escasez:", avg_shortage_cost)
+        print("Costo total:", total_cost)
+        print("---------------------------------------------------")
 
-# Graficar los resultados
-plot_results(results, simulation_time)
+    # Graficar los resultados
+    plot_results(results, simulation_time)
+
+if __name__ == "__main__":
+    main()
